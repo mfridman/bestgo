@@ -58,11 +58,13 @@ type point struct {
 	count int32
 }
 
+// could also be done directly in sql.
+// https://tapoueh.org/blog/2014/02/postgresql-aggregates-and-histograms/?utm_source=pocket_mylist
 func plot(points []point) string {
 	var max int32
 	for _, p := range points {
-		if p := p.count; p > max {
-			max = p
+		if p.count > max {
+			max = p.count
 		}
 	}
 	var b strings.Builder
