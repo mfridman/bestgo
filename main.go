@@ -23,7 +23,9 @@ func main() {
 		log.Fatalf("failed to parse flags: %v", err)
 	}
 	if *repoName == "" {
-		log.Fatal("repo name cannot be empty. Example repo: go-chi/chi")
+		fmt.Printf("error: repo cannot be empty. Example -repo go-chi/chi\n")
+		fs.Usage()
+		os.Exit(1)
 	}
 	var timeInterval api.TimeIntervalType
 	switch *interval {
@@ -41,7 +43,7 @@ func main() {
 		TimeInterval: timeInterval,
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(fmt.Errorf("error: failed to get repo metrics from api: %w", err))
 	}
 	var points []point
 	for _, m := range resp.GetData() {
