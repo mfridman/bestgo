@@ -9,7 +9,7 @@ https://buf.build/mf192/bestofgo/docs/main/api#api.APIService
 ## Usage 
 
 ```bash
-go install github.com/mfridman/bestgo
+go install github.com/mfridman/bestgo@latest
 ```
 
 ```
