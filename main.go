@@ -7,10 +7,21 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 
+	"github.com/manifoldco/promptui"
 	"github.com/peterbourgon/ff/v3"
+	"github.com/ryanuber/columnize"
 	"go.buf.build/demolab/template-twirp/mf192/bestofgo/api"
+)
+
+const (
+	apiURL = "https://api.bestofgo.dev"
+)
+
+var (
+	re = regexp.MustCompile(`(?m)\[(.*?)\s*\]`)
 )
 
 func main() {
@@ -27,6 +38,8 @@ func main() {
 		fs.Usage()
 		os.Exit(1)
 	}
+	*repoName = strings.TrimSpace(*repoName)
+
 	var timeInterval api.TimeIntervalType
 	switch *interval {
 	case "month":
@@ -37,20 +50,19 @@ func main() {
 		timeInterval = api.TimeIntervalType_TIME_INTERVAL_TYPE_YEAR
 	}
 
-	client := api.NewAPIServiceProtobufClient("https://api.bestofgo.dev", http.DefaultClient)
-	resp, err := client.GetRepoMetrics(context.Background(), &api.GetRepoMetricsRequest{
-		RepoName:     *repoName,
-		TimeInterval: timeInterval,
-	})
+	metrics, err := fetchRepoMetricsWithRetryPrompt(*repoName, timeInterval)
 	if err != nil {
 		log.Fatalln(fmt.Errorf("error: failed to get repo metrics from api: %w", err))
 	}
 	var points []point
-	for _, m := range resp.GetData() {
+	for _, m := range metrics.GetData() {
 		points = append(points, point{date: m.X, count: m.Y})
 	}
 	fmt.Println(plot(points))
-	fmt.Printf("Repository: %v has %d ⭐️ stars total\n", *repoName, resp.GetTotalStars())
+	fmt.Printf("Repository: %v has %d ⭐️ stars total\n",
+		metrics.GetRepoName(),
+		metrics.GetTotalStars(),
+	)
 }
 
 type point struct {
@@ -79,4 +91,60 @@ func plot(points []point) string {
 			strings.Repeat(`■`, int(l))))
 	}
 	return b.String()
+}
+
+func fetchRepoMetrics(repoName string, timeInterval api.TimeIntervalType) (
+	*api.GetRepoMetricsResponse, error,
+) {
+	client := api.NewAPIServiceProtobufClient(apiURL, http.DefaultClient)
+	resp, err := client.GetRepoMetrics(context.Background(), &api.GetRepoMetricsRequest{
+		RepoName:     repoName,
+		TimeInterval: timeInterval,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch repository metrics from api: %w", err)
+	}
+	return resp, nil
+}
+
+func fetchRepoMetricsWithRetryPrompt(repoName string, timeInterval api.TimeIntervalType) (
+	*api.GetRepoMetricsResponse, error,
+) {
+	resp, err := fetchRepoMetrics(repoName, timeInterval)
+	if err != nil {
+		return nil, err
+	}
+	if len(resp.GetSuggestions()) > 0 {
+		fmt.Printf("Could not match repository: %s\n\n", repoName)
+		prompt := promptui.Select{
+			Label: "Was that a typo? Did you mean one of these",
+		}
+		var items []string
+		for i, repo := range resp.GetSuggestions() {
+			i++
+			items = append(items, fmt.Sprintf("%d.| [|%s|] with %d|stars",
+				i,
+				repo.GetRepoFullName(),
+				repo.GetRepoStargazers()),
+			)
+		}
+		prompt.Items = strings.Split(columnize.SimpleFormat(items), "\n")
+
+		_, result, err := prompt.Run()
+		if err != nil {
+			return nil, fmt.Errorf("failed on ui prompt: %w", err)
+		}
+		out := re.FindStringSubmatch(result)
+		if len(out) == 2 {
+			repoName = strings.TrimSpace(out[1])
+			resp, err = fetchRepoMetrics(repoName, timeInterval)
+			if err != nil {
+				return nil, err
+			}
+			return resp, nil
+		}
+		return nil, fmt.Errorf("failed to match repository: %v", repoName)
+	}
+
+	return resp, nil
 }
