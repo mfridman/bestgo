@@ -1,6 +1,6 @@
 # bestgo
 
-`bestgo` is a CLI that pulls live data from https://api.bestofgo.dev (UI coming soon). This is an application that scrapes GitHub data for Go repositories that have 50 or more stars ⭐️ once an hour.
+`bestgo` is a CLI that pulls live data from https://api.bestofgo.dev (UI coming soon). This is an application that scrapes GitHub data for Go repositories that have **50 or more stars ⭐️** once an hour.
 
 The API is Protobuf-based and implemented with Twirp. You can view the Protobuf docs for the APIServer here:
 
