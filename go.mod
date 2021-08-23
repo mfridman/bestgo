@@ -7,5 +7,5 @@ require (
 	github.com/peterbourgon/ff/v3 v3.1.0
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/ryanuber/columnize v2.1.2+incompatible
-	go.buf.build/demolab/template-twirp/mf192/bestofgo v1.1.4
+	go.buf.build/demolab/twirp-go/mf192/bestofgo v1.1.25
 )

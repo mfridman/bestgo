@@ -13,7 +13,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/peterbourgon/ff/v3"
 	"github.com/ryanuber/columnize"
-	"go.buf.build/demolab/template-twirp/mf192/bestofgo/api"
+	"go.buf.build/demolab/twirp-go/mf192/bestofgo/api"
 )
 
 const (

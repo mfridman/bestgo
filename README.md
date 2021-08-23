@@ -37,15 +37,17 @@ Repository: go-chi/chi has 9879 ⭐️ stars total
 
 ### Bonus
 
-Since the API is Protobuf-based, anyone can pull the SDK Client and just use it. Huh? Don't I need to pull the `proto` files and install a bunch of plugins and then locally generate my source code?
+Since the API is Protobuf-based, anyone can pull the SDK Client and just use it. Huh? Don't I need to pull the `proto` files, install a bunch of plugins and then locally generate my source code?
+
+**Nope!**
 
 Heh, check out the source code, the interesting bit is *where* the SDK is being fetched from:
 
 ```go
-import "go.buf.build/demolab/template-twirp/mf192/bestofgo/api"
+import "go.buf.build/demolab/twirp-go/mf192/bestofgo/api"
 ```
 
-That's right, there are hosted Protobuf files on [buf.build](https://buf.build ) as well as `protoc`-based plugins (in this case Go + Twirp). Which means code generation is happening remotely and you don't have to do anything. 
+That's right, there are hosted Protobuf files on [buf.build](https://buf.build) as well as `protoc`-based templates (in this case Go + Twirp). Which means code generation is taking place remotely and you don't have to do anything. 
 
 Just `go get` the code, run `go mod tidy` and you're ready to use it, just like this CLI!
 
