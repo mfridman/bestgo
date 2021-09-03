@@ -33,8 +33,8 @@ github.com/ryanuber/columnize v2.1.2+incompatible h1:C89EOx/XBWwIXl8wm8OPJBd7kPF
 github.com/ryanuber/columnize v2.1.2+incompatible/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
 github.com/twitchtv/twirp v8.1.0+incompatible h1:KGXanpa9LXdVE/V5P/tA27rkKFmXRGCtSNT7zdeeVOY=
 github.com/twitchtv/twirp v8.1.0+incompatible/go.mod h1:RRJoFSAmTEh2weEqWtpPE3vFK5YBhA6bqp2l1kfCC5A=
-go.buf.build/demolab/twirp-go/mf192/bestofgo v1.1.25 h1:pSpxeQEYDXC2n/0nOxwsNq5B6bDSPpvHuZrnBKzzbmM=
-go.buf.build/demolab/twirp-go/mf192/bestofgo v1.1.25/go.mod h1:GvD+RqjFILXEvInaafXc3GlsVnyT3WfqUd05TIsLuE8=
+go.buf.build/demolab/twirp-go/mf192/bestofgo v1.1.35 h1:P+NxKGwezHSF4L59Pv+4Wuj9cscoJFavUjtwcQGQlA8=
+go.buf.build/demolab/twirp-go/mf192/bestofgo v1.1.35/go.mod h1:GvD+RqjFILXEvInaafXc3GlsVnyT3WfqUd05TIsLuE8=
 golang.org/x/sys v0.0.0-20181122145206-62eef0e2fa9b h1:MQE+LT/ABUuuvEZ+YQAMSXindAdUh7slEmAkup74op4=
 golang.org/x/sys v0.0.0-20181122145206-62eef0e2fa9b/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 h1:E7g+9GITq07hpfrRu66IVDexMakfv52eLZ2CXBWiKr4=
