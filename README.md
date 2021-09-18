@@ -1,6 +1,8 @@
 # bestgo
 
-`bestgo` is a CLI that pulls live data from https://api.bestofgo.dev (UI coming soon). This is an application that scrapes GitHub data for Go repositories that have **50 or more stars ⭐️** once an hour.
+`bestgo` is a CLI that pulls live data from https://api.bestofgo.dev. This is an application that scrapes GitHub data for Go repositories that have **50 or more stars ⭐️** once an hour.
+
+The UI is now live at https://bestofgo.dev.
 
 The API is Protobuf-based and implemented with Twirp. You can view the Protobuf docs for the APIServer here:
 
@@ -23,16 +25,17 @@ Usage of bestgo:
 Example:
 
 ```bash
-$ bestgo -repo go-chi/chi -i year 
-2015 [215]	|■■■■■
-2016 [730]	|■■■■■■■■■■■■■■■■■■
-2017 [1826]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-2018 [1769]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-2019 [2081]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-2020 [1948]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-2021 [1310]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+$ bestgo -repo golang/go -i year
+2014 [4454]	|■■■■■■■■■■■■■
+2015 [7440]	|■■■■■■■■■■■■■■■■■■■■■■
+2016 [9158]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+2017 [12205]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+2018 [15276]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+2019 [16538]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+2020 [14117]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+2021 [10785]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
-Repository: go-chi/chi has 9879 ⭐️ stars total
+Repository: golang/go has 89973 ⭐️ stars total
 ```
 
 ### Bonus
