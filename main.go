@@ -8,12 +8,17 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
+	"github.com/bufbuild/connect-go"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/manifoldco/promptui"
 	"github.com/peterbourgon/ff/v3"
 	"github.com/ryanuber/columnize"
-	"go.buf.build/demolab/twirp-go/mf192/bestofgo/api"
+	"go.buf.build/bufbuild/connect-go/mf192/bestofgo/api"
+	"go.buf.build/bufbuild/connect-go/mf192/bestofgo/api/apiconnect"
+	"go.buf.build/bufbuild/connect-go/mf192/bestofgo/datapb"
 )
 
 const (
@@ -28,7 +33,7 @@ func main() {
 	fs := flag.NewFlagSet("bestgo", flag.ExitOnError)
 	var (
 		repoName = fs.String("repo", "", "full repository name. Example: go-chi/chi (mandatory)")
-		interval = fs.String("i", "year", "grouping interval. Supported: year, quarter, month")
+		interval = fs.String("i", "year", "grouping interval. Supported: year, quarter, month, day")
 	)
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		log.Fatalf("failed to parse flags: %v", err)
@@ -40,14 +45,16 @@ func main() {
 	}
 	*repoName = strings.TrimSpace(*repoName)
 
-	var timeInterval api.TimeIntervalType
+	var timeInterval datapb.TimeIntervalType
 	switch *interval {
+	case "day":
+		timeInterval = datapb.TimeIntervalType_TIME_INTERVAL_TYPE_DAY
 	case "month":
-		timeInterval = api.TimeIntervalType_TIME_INTERVAL_TYPE_MONTH
+		timeInterval = datapb.TimeIntervalType_TIME_INTERVAL_TYPE_MONTH
 	case "quarter":
-		timeInterval = api.TimeIntervalType_TIME_INTERVAL_TYPE_QUARTER
+		timeInterval = datapb.TimeIntervalType_TIME_INTERVAL_TYPE_QUARTER
 	default:
-		timeInterval = api.TimeIntervalType_TIME_INTERVAL_TYPE_YEAR
+		timeInterval = datapb.TimeIntervalType_TIME_INTERVAL_TYPE_YEAR
 	}
 
 	metrics, err := fetchRepoMetricsWithRetryPrompt(*repoName, timeInterval)
@@ -60,7 +67,7 @@ func main() {
 	}
 	fmt.Println(plot(points))
 	fmt.Printf("Repository: %v has %d ⭐️ stars total\n",
-		metrics.GetRepoName(),
+		lipgloss.NewStyle().Foreground(lipgloss.Color("68")).Render(metrics.GetRepoName()),
 		metrics.GetTotalStars(),
 	)
 }
@@ -83,33 +90,46 @@ func plot(points []point) string {
 	for i := 0; i < len(points); i++ {
 		var l int32
 		if max > 0 {
-			l = (points[i].count*50 + max/2) / max
+			l = (points[i].count*30 + max/2) / max
 		}
-		b.WriteString(fmt.Sprintf("%s [%v]\t|%v\n",
+		b.WriteString(fmt.Sprintf("%s [%v]%s|%v\n",
 			points[i].date,
 			points[i].count,
+			strings.Repeat(" ", addPadding(points[i].count, max)),
 			strings.Repeat(`■`, int(l))))
 	}
 	return b.String()
 }
 
-func fetchRepoMetrics(repoName string, timeInterval api.TimeIntervalType) (
-	*api.GetRepoMetricsResponse, error,
-) {
-	client := api.NewAPIServiceProtobufClient(apiURL, http.DefaultClient)
-	resp, err := client.GetRepoMetrics(context.Background(), &api.GetRepoMetricsRequest{
+func addPadding(count, max int32) int {
+	m := len(strconv.Itoa(int(max)))
+	c := len(strconv.Itoa(int(count)))
+	if c >= m {
+		return 0
+	}
+	return m - c
+}
+
+func fetchRepoMetrics(
+	repoName string,
+	timeInterval datapb.TimeIntervalType,
+) (*api.GetRepoMetricsResponse, error) {
+	client := apiconnect.NewAPIServiceClient(http.DefaultClient, apiURL)
+	req := connect.NewRequest(&api.GetRepoMetricsRequest{
 		RepoName:     repoName,
 		TimeInterval: timeInterval,
 	})
+	resp, err := client.GetRepoMetrics(context.Background(), req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch repository metrics from api: %w", err)
 	}
-	return resp, nil
+	return resp.Msg, nil
 }
 
-func fetchRepoMetricsWithRetryPrompt(repoName string, timeInterval api.TimeIntervalType) (
-	*api.GetRepoMetricsResponse, error,
-) {
+func fetchRepoMetricsWithRetryPrompt(
+	repoName string,
+	timeInterval datapb.TimeIntervalType,
+) (*api.GetRepoMetricsResponse, error) {
 	resp, err := fetchRepoMetrics(repoName, timeInterval)
 	if err != nil {
 		return nil, err
