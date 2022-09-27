@@ -11,14 +11,14 @@ import (
 	"strconv"
 	"strings"
 
+	"buf.build/gen/go/mf192/bestofgo/library/connect-go/api/apiconnect"
+	"buf.build/gen/go/mf192/bestofgo/library/go/api"
+	"buf.build/gen/go/mf192/bestofgo/library/go/datapb"
 	"github.com/bufbuild/connect-go"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/manifoldco/promptui"
 	"github.com/peterbourgon/ff/v3"
 	"github.com/ryanuber/columnize"
-	"go.buf.build/bufbuild/connect-go/mf192/bestofgo/api"
-	"go.buf.build/bufbuild/connect-go/mf192/bestofgo/api/apiconnect"
-	"go.buf.build/bufbuild/connect-go/mf192/bestofgo/datapb"
 )
 
 const (
