@@ -1,14 +1,12 @@
 # bestgo
 
-`bestgo` is a CLI that pulls live data from https://api.bestofgo.dev. This is an application that scrapes GitHub data for Go repositories that have **50 or more stars ⭐️** once an hour.
+`bestgo` is a CLI that pulls aggregated star counts from the best of go API, a website that polls GitHub stars every 1 hour for repositories that have **>=50 stars ⭐️**.
 
-The UI is now live at https://bestofgo.dev.
+The best of go API is implemented with [connect-go] and the Protobuf definitions are published:
 
-The API is Protobuf-based and implemented with Twirp. You can view the Protobuf docs for the APIServer here:
+https://buf.build/mf192/bestofgo/docs/main:api
 
-https://buf.build/mf192/bestofgo/docs/main/api#api.APIService
-
-## Usage 
+## Usage
 
 ```bash
 go install github.com/mfridman/bestgo@latest
@@ -17,7 +15,7 @@ go install github.com/mfridman/bestgo@latest
 ```
 Usage of bestgo:
   -i string
-        grouping interval. Supported: year, quarter, month (default "year")
+        grouping interval. Supported: year, quarter, month, day (default "year")
   -repo string
         full repository name. Example: go-chi/chi (mandatory)
 ```
@@ -26,34 +24,45 @@ Example:
 
 ```bash
 $ bestgo -repo golang/go -i year
-2014 [4454]	|■■■■■■■■■■■■■
-2015 [7440]	|■■■■■■■■■■■■■■■■■■■■■■
-2016 [9158]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-2017 [12205]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-2018 [15276]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-2019 [16538]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-2020 [14117]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-2021 [10785]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+2014 [4411] |■■■■■■■■
+2015 [7366] |■■■■■■■■■■■■■■
+2016 [9055] |■■■■■■■■■■■■■■■■■
+2017 [12048]|■■■■■■■■■■■■■■■■■■■■■■
+2018 [15030]|■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+2019 [16177]|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+2020 [13713]|■■■■■■■■■■■■■■■■■■■■■■■■■
+2021 [14529]|■■■■■■■■■■■■■■■■■■■■■■■■■■■
+2022 [11847]|■■■■■■■■■■■■■■■■■■■■■■
 
-Repository: golang/go has 89973 ⭐️ stars total
+Repository: golang/go has 104176 ⭐️ stars total
 ```
 
 ### Bonus
 
-Since the API is Protobuf-based, anyone can pull the SDK Client and just use it. Huh? Don't I need to pull the `proto` files, install a bunch of plugins and then locally generate my source code?
+Since the API is implemented with an RPC framework and the Protobuf definitions are published to [Buf Schema Registry][buf-build], anyone can pull an SDK client and just start using it.
+
+Huh?! Don't I need to pull the Protobuf files, install plugins and generate the stubs locally?
 
 **Nope!**
 
-Heh, check out the source code, the interesting bit is *where* the SDK is being fetched from:
+The Buf Schema Registry implements a Go module proxy that exposes Generated SDKs. This is super cool because you can continue using `go get ...` and the source code is generated for you.
 
-```go
-import "go.buf.build/demolab/twirp-go/mf192/bestofgo/api"
+With just 2 commands:
+
+```bash
+go get buf.build/gen/go/mf192/bestofgo/library/go
+go get buf.build/gen/go/mf192/bestofgo/library/connect-go
 ```
 
-That's right, there are hosted Protobuf files on [buf.build](https://buf.build) as well as `protoc`-based templates (in this case Go + Twirp). Which means code generation is taking place remotely and you don't have to do anything. 
+We get an Go SDK client that we can import and start using:
 
-Just `go get` the code, run `go mod tidy` and you're ready to use it, just like this CLI!
+```go
+import (
+      "buf.build/gen/go/mf192/bestofgo/library/connect-go/api/apiconnect"
+      "buf.build/gen/go/mf192/bestofgo/library/go/api"
+      "buf.build/gen/go/mf192/bestofgo/library/go/datapb"
+)
+```
 
-If this doesn't excite you, I don't know what will. Maybe this [tweet](https://twitter.com/_mfridman/status/1426677430320783364)
-
-The folks over at https://buf.build are working on some neat stuff, check it out!
+[buf-build]: https://buf.build
+[connect-go]: https://github.com/bufbuild/connect-go
