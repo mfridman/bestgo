@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	buf.build/gen/go/mf192/bestofgo/library/connect-go v0.5.0-20220829202253-56a08db5a142.1
-	buf.build/gen/go/mf192/bestofgo/library/go v1.28.1-20220829202253-56a08db5a142.4
+	buf.build/gen/go/mf192/bestofgo/library/go v1.28.1-20220927133650-ea6e16be4673.5
 	github.com/bufbuild/connect-go v0.5.0
 	github.com/charmbracelet/lipgloss v0.6.0
 	github.com/manifoldco/promptui v0.9.0

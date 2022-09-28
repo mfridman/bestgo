@@ -1,7 +1,7 @@
 buf.build/gen/go/mf192/bestofgo/library/connect-go v0.5.0-20220829202253-56a08db5a142.1 h1:O/yKdaMGr8BWb6/sYaad5loTZ5V0DhfmqtG75hq6S48=
 buf.build/gen/go/mf192/bestofgo/library/connect-go v0.5.0-20220829202253-56a08db5a142.1/go.mod h1:+XjJUROGxO43GGjwssmICBf0WFA/cJ0vFeaKhUFvnQY=
-buf.build/gen/go/mf192/bestofgo/library/go v1.28.1-20220829202253-56a08db5a142.4 h1:Gz2FqACoHhdkphluDSTpr9iAyv9vgOeI3ubo+dD8OJg=
-buf.build/gen/go/mf192/bestofgo/library/go v1.28.1-20220829202253-56a08db5a142.4/go.mod h1:rsIr3B0F+jPhvOpGirLA0UVuP/JJ/5XKS0+5rvg4gBQ=
+buf.build/gen/go/mf192/bestofgo/library/go v1.28.1-20220927133650-ea6e16be4673.5 h1:RLXcHbAJ5ABZSGpqnKs1rpZ+7WxBj3zIpN5IEv3aJdE=
+buf.build/gen/go/mf192/bestofgo/library/go v1.28.1-20220927133650-ea6e16be4673.5/go.mod h1:rsIr3B0F+jPhvOpGirLA0UVuP/JJ/5XKS0+5rvg4gBQ=
 github.com/bufbuild/connect-go v0.5.0 h1:JFbWPWpasBqzM5h/awoRhAXmLERZQlQ5xTn42uf+5ao=
 github.com/bufbuild/connect-go v0.5.0/go.mod h1:ZEtBnQ7J/m7bvWOW+H8T/+hKQCzPVfhhhICuvtcnjlI=
 github.com/charmbracelet/lipgloss v0.6.0 h1:1StyZB9vBSOyuZxQUcUwGr17JmojPNm87inij9N3wJY=
