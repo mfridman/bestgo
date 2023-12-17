@@ -32,14 +32,14 @@ var (
 func main() {
 	fs := flag.NewFlagSet("bestgo", flag.ExitOnError)
 	var (
-		repoName = fs.String("repo", "", "full repository name. Example: go-chi/chi (mandatory)")
+		repoName = fs.String("repo", "", "full repository name. Example: pressly/goose (mandatory)")
 		interval = fs.String("i", "year", "grouping interval. Supported: year, quarter, month, day")
 	)
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		log.Fatalf("failed to parse flags: %v", err)
 	}
 	if *repoName == "" {
-		fmt.Printf("error: repo cannot be empty. Example -repo go-chi/chi\n")
+		fmt.Printf("error: repo cannot be empty. Example -repo pressly/goose\n")
 		fs.Usage()
 		os.Exit(1)
 	}
