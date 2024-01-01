@@ -1,7 +1,7 @@
 buf.build/gen/go/mf192/bestofgo/connectrpc/go v1.13.0-20231214134413-3f090cfedca3.1 h1:g6QQF5mBKZSo1/WRKRhpIBzVkbiWIaWXyRKHpDAd7mk=
 buf.build/gen/go/mf192/bestofgo/connectrpc/go v1.13.0-20231214134413-3f090cfedca3.1/go.mod h1:D+j71lEk0OytyRfIY+mJIH0L1+bwImF+RKTJrgfycg8=
-buf.build/gen/go/mf192/bestofgo/protocolbuffers/go v1.31.0-20231214134413-3f090cfedca3.2 h1:sFMMRBGwHlEC/hVY6Vi1yqpTR1XTDBfpyDYAzFkl35w=
-buf.build/gen/go/mf192/bestofgo/protocolbuffers/go v1.31.0-20231214134413-3f090cfedca3.2/go.mod h1:DfomIn6mTPRgafGTQUecGtRgki2lnIypvaUKSDnl/iM=
+buf.build/gen/go/mf192/bestofgo/protocolbuffers/go v1.32.0-20231214134413-3f090cfedca3.1 h1:6pvJBCvcNu22plzZ/lw5OxTOP9+E4K1GdPSBfC5Bpdk=
+buf.build/gen/go/mf192/bestofgo/protocolbuffers/go v1.32.0-20231214134413-3f090cfedca3.1/go.mod h1:H2edJvLfzZXx3NJBOzlfv4lLCkc0UzjAR6dUQlqs4NI=
 connectrpc.com/connect v1.13.0 h1:lGs5maZZzWOOD+PFFiOt5OncKmMsk9ZdPwpy5jcmaYg=
 connectrpc.com/connect v1.13.0/go.mod h1:uHAFHtYgeSZJxXrkN1IunDpKghnTXhYbVh0wW4StPW0=
 github.com/aymanbagabas/go-osc52 v1.0.3 h1:DTwqENW7X9arYimJrPeGZcV0ln14sGMt3pHZspWD+Mg=
@@ -56,5 +56,5 @@ golang.org/x/sys v0.0.0-20220927170352-d9d178bc13c6/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/text v0.13.0 h1:ablQoSUd0tRdKxZewP80B+BaqeKJuVhuRxj/dkrun3k=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 google.golang.org/protobuf v1.26.0-rc.1/go.mod h1:jlhhOSvTdKEhbULTjvd4ARK9grFBp09yW+WbY/TyQbw=
-google.golang.org/protobuf v1.31.0 h1:g0LDEJHgrBl9N9r17Ru3sqWhkIx2NB67okBHPwC7hs8=
-google.golang.org/protobuf v1.31.0/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
+google.golang.org/protobuf v1.32.0 h1:pPC6BG5ex8PDFnkbrGU3EixyhKcQ2aDuBS36lqK/C7I=
+google.golang.org/protobuf v1.32.0/go.mod h1:c6P6GXX6sHbq/GpV6MGZEdwhWPcYBgnhAHhKbcUYpos=
