@@ -5,18 +5,15 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
 
-	"buf.build/gen/go/mf192/bestofgo/connectrpc/go/api/apiconnect"
-	"buf.build/gen/go/mf192/bestofgo/protocolbuffers/go/api"
-	"buf.build/gen/go/mf192/bestofgo/protocolbuffers/go/datapb"
-	"connectrpc.com/connect"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/manifoldco/promptui"
+	"github.com/mfridman/bestgo/gen/go/api"
+	"github.com/mfridman/bestgo/gen/go/datapb"
 	"github.com/peterbourgon/ff/v3"
 	"github.com/ryanuber/columnize"
 )
@@ -29,35 +26,41 @@ var (
 	re = regexp.MustCompile(`(?m)\[(.*?)\s*\]`)
 )
 
+func convertToTimeInterval(interval string) datapb.TimeIntervalType {
+	switch interval {
+	case "day":
+		return datapb.TimeIntervalType_TIME_INTERVAL_TYPE_DAY
+	case "month":
+		return datapb.TimeIntervalType_TIME_INTERVAL_TYPE_MONTH
+	case "quarter":
+		return datapb.TimeIntervalType_TIME_INTERVAL_TYPE_QUARTER
+	default:
+		return datapb.TimeIntervalType_TIME_INTERVAL_TYPE_YEAR
+	}
+}
+
 func main() {
 	fs := flag.NewFlagSet("bestgo", flag.ExitOnError)
 	var (
-		repoName = fs.String("repo", "", "full repository name. Example: pressly/goose (mandatory)")
+		repoName = fs.String("repo", "", "full repository name. Example: bufbuild/buf (mandatory)")
 		interval = fs.String("i", "year", "grouping interval. Supported: year, quarter, month, day")
 	)
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		log.Fatalf("failed to parse flags: %v", err)
 	}
 	if *repoName == "" {
-		fmt.Printf("error: repo cannot be empty. Example -repo pressly/goose\n")
+		fmt.Printf("error: repo cannot be empty. Example -repo bufbuild/buf\n")
 		fs.Usage()
 		os.Exit(1)
 	}
-	*repoName = strings.TrimSpace(*repoName)
 
-	var timeInterval datapb.TimeIntervalType
-	switch *interval {
-	case "day":
-		timeInterval = datapb.TimeIntervalType_TIME_INTERVAL_TYPE_DAY
-	case "month":
-		timeInterval = datapb.TimeIntervalType_TIME_INTERVAL_TYPE_MONTH
-	case "quarter":
-		timeInterval = datapb.TimeIntervalType_TIME_INTERVAL_TYPE_QUARTER
-	default:
-		timeInterval = datapb.TimeIntervalType_TIME_INTERVAL_TYPE_YEAR
-	}
+	client := api.NewClient(apiURL)
 
-	metrics, err := fetchRepoMetricsWithRetryPrompt(*repoName, timeInterval)
+	metrics, err := fetchRepoMetricsWithRetryPrompt(
+		client,
+		strings.TrimSpace(*repoName),
+		convertToTimeInterval(*interval),
+	)
 	if err != nil {
 		log.Fatalln(fmt.Errorf("error: failed to get repo metrics from api: %w", err))
 	}
@@ -110,27 +113,15 @@ func addPadding(count, max int32) int {
 	return m - c
 }
 
-func fetchRepoMetrics(
+func fetchRepoMetricsWithRetryPrompt(
+	client *api.Client,
 	repoName string,
 	timeInterval datapb.TimeIntervalType,
 ) (*api.GetRepoMetricsResponse, error) {
-	client := apiconnect.NewAPIServiceClient(http.DefaultClient, apiURL)
-	req := connect.NewRequest(&api.GetRepoMetricsRequest{
+	resp, err := client.APIService.GetRepoMetrics(context.Background(), &api.GetRepoMetricsRequest{
 		RepoName:     repoName,
 		TimeInterval: timeInterval,
 	})
-	resp, err := client.GetRepoMetrics(context.Background(), req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch repository metrics from api: %w", err)
-	}
-	return resp.Msg, nil
-}
-
-func fetchRepoMetricsWithRetryPrompt(
-	repoName string,
-	timeInterval datapb.TimeIntervalType,
-) (*api.GetRepoMetricsResponse, error) {
-	resp, err := fetchRepoMetrics(repoName, timeInterval)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +148,10 @@ func fetchRepoMetricsWithRetryPrompt(
 		out := re.FindStringSubmatch(result)
 		if len(out) == 2 {
 			repoName = strings.TrimSpace(out[1])
-			resp, err = fetchRepoMetrics(repoName, timeInterval)
+			resp, err := client.APIService.GetRepoMetrics(context.Background(), &api.GetRepoMetricsRequest{
+				RepoName:     repoName,
+				TimeInterval: timeInterval,
+			})
 			if err != nil {
 				return nil, err
 			}
