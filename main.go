@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -14,7 +14,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/mfridman/bestgo/gen/go/api"
 	"github.com/mfridman/bestgo/gen/go/datapb"
-	"github.com/peterbourgon/ff/v3"
+	"github.com/mfridman/cli"
 	"github.com/ryanuber/columnize"
 )
 
@@ -40,39 +40,51 @@ func convertToTimeInterval(interval string) datapb.TimeIntervalType {
 }
 
 func main() {
-	fs := flag.NewFlagSet("bestgo", flag.ExitOnError)
-	var (
-		repoName = fs.String("repo", "", "full repository name. Example: bufbuild/buf (mandatory)")
-		interval = fs.String("i", "year", "grouping interval. Supported: year, quarter, month, day")
-	)
-	if err := ff.Parse(fs, os.Args[1:]); err != nil {
-		log.Fatalf("failed to parse flags: %v", err)
+	root := &cli.Command{
+		Name:        "bestgo",
+		Usage:       "bestgo [flags]",
+		Description: "bestgo is a CLI tool to get the star history of a Go repository",
+		Flags: cli.FlagSetFunc(func(fs *flag.FlagSet) {
+			fs.String("repo", "", "Full repository name. e.g., bufbuild/buf")
+			fs.String("i", "year", "The grouping interval [day,month,quarter,year]")
+		}),
+		Exec: func(ctx context.Context, s *cli.State) error {
+			var (
+				repoName = cli.GetFlag[string](s, "repo")
+				interval = cli.GetFlag[string](s, "i")
+
+				client = api.NewClient(apiURL)
+			)
+
+			metrics, err := fetchRepoMetricsWithRetryPrompt(
+				client,
+				strings.TrimSpace(repoName),
+				convertToTimeInterval(interval),
+			)
+			if err != nil {
+				return fmt.Errorf("failed to get repo metrics from api: %w", err)
+			}
+			var points []point
+			for _, m := range metrics.GetData() {
+				points = append(points, point{date: m.X, count: m.Y})
+			}
+
+			fmt.Fprintln(s.Stdout, plot(points))
+			fmt.Fprintf(s.Stdout, "Repository: %v has %d ⭐️ stars total\n",
+				lipgloss.NewStyle().Foreground(lipgloss.Color("68")).Render(metrics.GetRepoName()),
+				metrics.GetTotalStars(),
+			)
+			return nil
+		},
 	}
-	if *repoName == "" {
-		fmt.Printf("error: repo cannot be empty. Example -repo bufbuild/buf\n")
-		fs.Usage()
+
+	if err := cli.ParseAndRun(context.Background(), root, os.Args[1:], nil); err != nil {
+		if errors.Is(err, flag.ErrHelp) {
+			return
+		}
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
-
-	client := api.NewClient(apiURL)
-
-	metrics, err := fetchRepoMetricsWithRetryPrompt(
-		client,
-		strings.TrimSpace(*repoName),
-		convertToTimeInterval(*interval),
-	)
-	if err != nil {
-		log.Fatalln(fmt.Errorf("error: failed to get repo metrics from api: %w", err))
-	}
-	var points []point
-	for _, m := range metrics.GetData() {
-		points = append(points, point{date: m.X, count: m.Y})
-	}
-	fmt.Println(plot(points))
-	fmt.Printf("Repository: %v has %d ⭐️ stars total\n",
-		lipgloss.NewStyle().Foreground(lipgloss.Color("68")).Render(metrics.GetRepoName()),
-		metrics.GetTotalStars(),
-	)
 }
 
 type point struct {
@@ -126,7 +138,11 @@ func fetchRepoMetricsWithRetryPrompt(
 		return nil, err
 	}
 	if len(resp.GetSuggestions()) > 0 {
-		fmt.Printf("Could not match repository: %s\n\n", repoName)
+		name := repoName
+		if name == "" {
+			name = "unspecified"
+		}
+		fmt.Printf("Could not match repository: %s\n\n", name)
 		prompt := promptui.Select{
 			Label: "Was that a typo? Did you mean one of these",
 		}
