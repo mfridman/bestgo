@@ -41,12 +41,12 @@ func convertToTimeInterval(interval string) datapb.TimeIntervalType {
 
 func main() {
 	root := &cli.Command{
-		Name:        "bestgo",
-		Usage:       "bestgo [flags]",
-		Description: "bestgo is a CLI tool to get the star history of a Go repository",
-		Flags: cli.FlagSetFunc(func(fs *flag.FlagSet) {
-			fs.String("repo", "", "Full repository name. e.g., bufbuild/buf")
-			fs.String("i", "year", "The grouping interval [day,month,quarter,year]")
+		Name:      "bestgo",
+		Usage:     "bestgo [flags]",
+		ShortHelp: "bestgo is a CLI tool to get the star history of a Go repository",
+		Flags: cli.FlagsFunc(func(f *flag.FlagSet) {
+			f.String("repo", "", "Full repository name. e.g., bufbuild/buf")
+			f.String("i", "year", "The grouping interval [day,month,quarter,year]")
 		}),
 		Exec: func(ctx context.Context, s *cli.State) error {
 			var (
@@ -78,10 +78,15 @@ func main() {
 		},
 	}
 
-	if err := cli.ParseAndRun(context.Background(), root, os.Args[1:], nil); err != nil {
+	if err := cli.Parse(root, os.Args[1:]); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
+			fmt.Fprintf(os.Stdout, "%s\n", cli.DefaultUsage(root))
 			return
 		}
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+	if err := cli.Run(context.Background(), root, nil); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}

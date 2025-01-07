@@ -7,7 +7,7 @@ toolchain go1.23.2
 require (
 	github.com/charmbracelet/lipgloss v0.6.0
 	github.com/manifoldco/promptui v0.9.0
-	github.com/mfridman/cli v0.0.0-20241223014309-608f3389cdda
+	github.com/mfridman/cli v0.2.0
 	github.com/ryanuber/columnize v2.1.2+incompatible
 	google.golang.org/protobuf v1.28.1
 )
